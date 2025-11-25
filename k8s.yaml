@@ -5,4 +5,6 @@ metadata:
 spec:
   containers:
     - name: hola-mundo
-      image: edisonpaul4/hola-mundo:10
+      image: hoverdev/hola-mundo:4
+      ports:
+        - containerPort: 3000
