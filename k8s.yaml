@@ -1,10 +1,33 @@
-apiVersion: v1
-kind: Pod
+#apiVersion: v1
+#kind: Pod
+#metadata:
+#  name: microservicio
+#spec:
+#  containers:
+#    - name: hola-mundo
+#      image: hoverdev/hola-mundo:4
+#      ports:
+#        - containerPort: 3000
+#Deployment maneja pods y replica sets
+apiVersion: apps/v1
+kind: Deployment  
 metadata:
   name: microservicio
+  labels:
+    app: microservicio
+    areanegocio: pagos
 spec:
-  containers:
-    - name: hola-mundo
-      image: hoverdev/hola-mundo:4
-      ports:
-        - containerPort: 3000
+  replicas: 3
+  selector:
+    matchLabels:
+      app: microservicio
+  template:
+    metadata:
+      labels:
+        app: microservicio
+    spec:
+      containers:
+        - name: hola-mundo
+          image: hoverdev/hola-mundo:4
+          ports:
+            - containerPort: 3000
