@@ -34,6 +34,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: microservicio
+            - secretRef:
+                name: microservicio
 ---
 apiVersion: v1
 kind: Service
@@ -53,3 +55,11 @@ metadata:
   name: microservicio
 data:
   LOG_LEVEL: "debug"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: microservicio
+data:
+  DATABASE_PASSWORD: U3VwZXJTZWd1cm8yMDI1
+---
