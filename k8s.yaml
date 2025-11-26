@@ -1,14 +1,7 @@
-#apiVersion: v1
-#kind: Pod
-#metadata:
-#  name: microservicio
-#spec:
-#  containers:
-#    - name: hola-mundo
-#      image: hoverdev/hola-mundo:4
-#      ports:
-#        - containerPort: 3000
-#Deployment maneja pods y replica sets
+# DEPLOYMENT: Crea y gestiona múltiples réplicas de pods
+# - Asegura que siempre haya N pods ejecutándose
+# - Si un pod falla, automáticamente crea uno nuevo
+# - Permite actualizaciones sin downtime
 apiVersion: apps/v1
 kind: Deployment  
 metadata:
@@ -17,10 +10,13 @@ metadata:
     app: microservicio
     areanegocio: pagos
 spec:
+  # Número de réplicas (pods) que debe mantener activos
   replicas: 3
+  # Selector para identificar qué pods gestiona este deployment
   selector:
     matchLabels:
       app: microservicio
+  # Plantilla para crear nuevos pods
   template:
     metadata:
       labels:
@@ -28,27 +24,50 @@ spec:
     spec:
       containers:
         - name: hola-mundo
+          # Imagen Docker a utilizar
           image: hoverdev/hola-mundo:4
           ports:
+            # Puerto en el que escucha la aplicación dentro del contenedor
             - containerPort: 3000
+          # Cargar variables de entorno desde ConfigMap
           envFrom:
             - configMapRef:
                 name: microservicio
             - secretRef:
                 name: microservicio
+          # Recursos mínimos garantizados al pod
+          resources:
+            requests:
+              cpu: 100m           # 100 milicores (0.1 CPU)
+              memory: 256Mi       # 256 Megabytes
+            # Recursos máximos permitidos al pod
+            limits:
+              cpu: 300m           # 300 milicores (0.3 CPU)
+              memory: 512Mi       # 512 Megabytes
 ---
+# SERVICE: Expone los pods a nivel de red
+# - Proporciona una IP estable para acceder a los pods
+# - Balancea carga entre los 3 pods del deployment
+# - Permite comunicación intra-cluster y externa
 apiVersion: v1
 kind: Service
 metadata:
   name: microservicio
 spec:
+  # Selecciona qué pods exponer (los que tengan label app: microservicio)
   selector:
     app: microservicio
   ports:
+    # Protocolo de transporte
     - protocol: TCP
+      # Puerto del servicio (acceso externo)
       port: 3000
+      # Puerto del pod (acceso interno)
       targetPort: 3000
 ---
+# CONFIGMAP: Almacena configuración en pares clave-valor
+# - No sensible (visible en etcd sin encripción)
+# - Se inyecta como variables de entorno en los pods
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -56,6 +75,10 @@ metadata:
 data:
   LOG_LEVEL: "debug"
 ---
+# SECRET: Almacena datos sensibles (contraseñas, tokens, etc.)
+# - Base64 codificado (no es encripción real, solo ofuscación)
+# - Se inyecta como variables de entorno en los pods
+# - DATABASE_PASSWORD decodificado: SuperSeguro2025
 apiVersion: v1
 kind: Secret
 metadata:
