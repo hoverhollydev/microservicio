@@ -5,13 +5,14 @@
 apiVersion: apps/v1
 kind: Deployment  
 metadata:
+  namespace: jp
   name: microservicio
   labels:
     app: microservicio
     areanegocio: pagos
 spec:
-  # Número de réplicas (pods) que debe mantener activos
-  replicas: 5
+  # Número de réplicas (pods) que debe mantener activos esto deja de tener importacia cuando se configura el objeto HorizontalPodAutoscaler
+  replicas: 1
   # Selector para identificar qué pods gestiona este deployment
   selector:
     matchLabels:
@@ -52,6 +53,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: jp
   name: microservicio
 spec:
   # Selecciona qué pods exponer (los que tengan label app: microservicio)
@@ -71,6 +73,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  namespace: jp
   name: microservicio
 data:
   LOG_LEVEL: "debug"
@@ -82,6 +85,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
+  namespace: jp
   name: microservicio
 data:
   DATABASE_PASSWORD: U3VwZXJTZWd1cm8yMDI1
@@ -94,7 +98,8 @@ data:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: microservicio-hpa
+  namespace: jp
+  name: microservicio
 spec:
   # Deployment a monitorear
   scaleTargetRef:
@@ -102,8 +107,8 @@ spec:
     kind: Deployment
     name: microservicio
   # Rango de réplicas permitidas
-  minReplicas: 3          # Mínimo 3 pods
-  maxReplicas: 10         # Máximo 10 pods
+  minReplicas: 2          # Mínimo 2 pods
+  maxReplicas: 6         # Máximo 6 pods
   # Métricas para el autoscaling
   metrics:
     # Basado en uso de CPU
@@ -111,15 +116,15 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 70    # Escala cuando CPU > 70%
+          type: Utilization # EN BASE AL REQUEST
+          averageUtilization: 90    # Escala cuando CPU > 90%
     # Basado en uso de Memoria
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80    # Escala cuando Memoria > 80%
+          averageUtilization: 90    # Escala cuando Memoria > 90%
   # Comportamiento de escalado
   behavior:
     scaleDown:
