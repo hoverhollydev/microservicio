@@ -1,14 +1,3 @@
-# NAMESPACE: Crea un espacio aislado para los recursos
-# - Agrupa recursos relacionados
-# - Permite multi-tenancy en el cluster
-# - Los recursos aquí solo se comunican con otros en el mismo namespace
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: jp
-  labels:
-    name: jp
----
 # DEPLOYMENT: Crea y gestiona múltiples réplicas de pods
 # - Asegura que siempre haya N pods ejecutándose
 # - Si un pod falla, automáticamente crea uno nuevo
