@@ -5,7 +5,8 @@
 apiVersion: apps/v1
 kind: Deployment  
 metadata:
-  namespace: jp
+  #namespace: jp anterior 
+  namespace: hoverdev-dev #namespace donde se desplegar en openshift redhat
   name: microservicio
   labels:
     app: microservicio
@@ -45,10 +46,10 @@ spec:
                 name: microservicio
             - secretRef:
                 name: microservicio
-            - configMapRef:
-                name: superconfigmap
-            - secretRef:
-                name: supersecreto
+            #- configMapRef:
+            #    name: superconfigmap
+            #- secretRef:
+            #    name: supersecreto
 ---
 # SERVICE: Expone los pods a nivel de red
 # - Proporciona una IP estable para acceder a los pods
@@ -57,7 +58,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: jp
+  namespace: hoverdev-dev
   name: microservicio
 spec:
   # Selecciona qué pods exponer (los que tengan label app: microservicio)
@@ -77,7 +78,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: jp
+  namespace: hoverdev-dev
   name: microservicio
 data:
   LOG_LEVEL: "debug"
@@ -89,7 +90,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: jp
+  namespace: hoverdev-dev
   name: microservicio
 data:
   DATABASE_PASSWORD: U3VwZXJTZWd1cm8yMDI1
